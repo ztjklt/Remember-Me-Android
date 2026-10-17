@@ -40,12 +40,12 @@ def test_wrong_predicted_speech_is_never_released():
     asyncio.run(run())
 
 
-def test_endpoint_silence_is_only_faster_in_explicit_streamed_mode():
+def test_endpoint_silence_preserves_natural_short_pauses():
     from app.realtime_providers import endpoint_silence
-    assert endpoint_silence(False,'streamed')==400
-    assert endpoint_silence(False,'fast')==800
-    assert endpoint_silence(False,'reviewed')==800
-    assert endpoint_silence(True,'streamed')==1400
+    assert endpoint_silence(False,'streamed')==1400
+    assert endpoint_silence(False,'fast')==1400
+    assert endpoint_silence(False,'reviewed')==1400
+    assert endpoint_silence(True,'streamed')==1800
 
 
 def test_tts_client_is_reused_until_call_closes(monkeypatch):
@@ -53,18 +53,25 @@ def test_tts_client_is_reused_until_call_closes(monkeypatch):
     from types import SimpleNamespace
     import httpx
     from pydantic import SecretStr
-    created=[];closed=[]
+    created=[];closed=[];requests=[]
     original=httpx.AsyncClient
     class Client(original):
         async def aclose(self):closed.append(self);await super().aclose()
+    def reply(req):
+        import json
+        requests.append(json.loads(req.content))
+        return httpx.Response(200,text='data: {"choices":[{"delta":{"audio":{"data":"AQI="}}}]}\n\ndata: [DONE]\n\n')
     def factory(**kw):
-        instance=Client(transport=httpx.MockTransport(lambda req:httpx.Response(200,text='data: {"choices":[{"delta":{"audio":{"data":"AQI="}}}]}\n\ndata: [DONE]\n\n')),**kw)
+        instance=Client(transport=httpx.MockTransport(reply),**kw)
         created.append(instance);return instance
     monkeypatch.setattr(httpx,'AsyncClient',factory)
     async def run():
         tts=XiaomiRealtime(SimpleNamespace(xiaomi_voice_base_url='https://api.xiaomimimo.com/v1',xiaomi_voice_api_key=SecretStr('test')))
         for _ in range(2):assert [p async for p in tts.stream('一句话。')]==[b'\x01\x02']
         assert len(created)==1 and not closed
+        assert requests[0]['messages'][-1]=={'role':'assistant','content':'一句话。'}
+        assert requests[0]['messages'][0]['role']=='user'
+        assert requests[0]['audio']=={'format':'pcm16','voice':'白桦'}
         await tts.close();assert len(closed)==1
     asyncio.run(run())
 

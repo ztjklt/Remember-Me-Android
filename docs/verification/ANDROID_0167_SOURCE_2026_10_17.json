@@ -1,0 +1,737 @@
+{
+  "source_repository": "https://github.com/ztjklt/Remember-Me",
+  "source_branch": "codex/work3200-device-20261016",
+  "previous_source_commit": "7e72c7779207dae28e1333368d332acdc91d3fcc",
+  "source_commit": "b64d58b022ef6b219c4ca6b0c02363898b1cb69e",
+  "android_version": "0.16.7-device-internal",
+  "android_version_code": 20261037,
+  "source_file_count": 1815,
+  "source_commits": [
+    {
+      "source_commit": "8c1c5bd76cdd21cce20e5745c7ea5d9b1e506303",
+      "committer_date": "2026-10-17T08:41:13+08:00",
+      "subject": "Avoid tea-time candidate repair and use a consistent warm voice"
+    },
+    {
+      "source_commit": "68a417002b60928a7da32724587bce1c437d2cf0",
+      "committer_date": "2026-10-17T08:44:47+08:00",
+      "subject": "Distinguish taste modifiers from time and define one fictional demo persona"
+    },
+    {
+      "source_commit": "5f7f2af26615125f5c254c0b4b73341573e07b3b",
+      "committer_date": "2026-10-17T08:51:51+08:00",
+      "subject": "Exercise evidence and persona voice modes through the actual Android UI"
+    },
+    {
+      "source_commit": "f07e33d77e5e5dea5ccec36b0b6883a8a98631fa",
+      "committer_date": "2026-10-17T08:56:34+08:00",
+      "subject": "Bound slow-review backup without discarding primary and tighten conversational delivery"
+    },
+    {
+      "source_commit": "9e3b18b9d4e9a1cab67051a4ec858efb41ef46da",
+      "committer_date": "2026-10-17T09:03:06+08:00",
+      "subject": "fix(voice): preserve reviewed unknown wording through synthesis"
+    },
+    {
+      "source_commit": "7dc9c0618a5b3fdd5ff0a1c0104ae9ff7c74b424",
+      "committer_date": "2026-10-17T09:13:27+08:00",
+      "subject": "fix(voice): keep generic followup words out of time proposal ranking"
+    },
+    {
+      "source_commit": "258feff65023af68a2d37f6e2b79954f7e2c0400",
+      "committer_date": "2026-10-17T09:20:05+08:00",
+      "subject": "fix(persona): omit impossible single-point dependencies in voice review"
+    },
+    {
+      "source_commit": "fbbab928bf1c34478a5b1a6ae99ae18b1361d36e",
+      "committer_date": "2026-10-17T09:26:02+08:00",
+      "subject": "fix(persona): preserve fully supported groups and focus everyday replies"
+    },
+    {
+      "source_commit": "b2597600265860cadc26cedbc3868324ee45330e",
+      "committer_date": "2026-10-17T09:46:08+08:00",
+      "subject": "Document 21 continuous voice trials and one fictional Chen demo"
+    },
+    {
+      "source_commit": "b96442e471d4198968e1c0bee765343dc076b3ef",
+      "committer_date": "2026-10-17T10:02:10+08:00",
+      "subject": "Add scoped contact-verified entrustments for Android relatives"
+    },
+    {
+      "source_commit": "713476efdcda8a733e2b4fdd612d1de2e271fc25",
+      "committer_date": "2026-10-17T10:14:14+08:00",
+      "subject": "Connect authorized Twin recall to readable letters and compact voice review"
+    },
+    {
+      "source_commit": "f9b66506ebf55f5387fdbb5a76ed0681b3f7cd6f",
+      "committer_date": "2026-10-17T10:28:29+08:00",
+      "subject": "Polish native letter unfolding and verify real recall playback"
+    },
+    {
+      "source_commit": "21951e46f5b6284baa6aa0280172f8f6c2b985c6",
+      "committer_date": "2026-10-17T10:35:47+08:00",
+      "subject": "Support wide letter layouts and isolate concurrent voice tests"
+    },
+    {
+      "source_commit": "655272b434072db8c1a7ed0baea1d4d48917c279",
+      "committer_date": "2026-10-17T10:36:18+08:00",
+      "subject": "fix: preserve entrusted recall when unrelated memories are added"
+    },
+    {
+      "source_commit": "8d912d2fcb0ccac14e32905e5f04f9d5cbf07b95",
+      "committer_date": "2026-10-17T10:37:31+08:00",
+      "subject": "Let envelope decoration follow content height"
+    },
+    {
+      "source_commit": "a4ae491f9a1895e11d4343e2ad7479f27d16388d",
+      "committer_date": "2026-10-17T10:39:22+08:00",
+      "subject": "fix: include the actual author in authorized entrusted letters"
+    },
+    {
+      "source_commit": "6e836c6c18122acff77edd16fa3da963b6059619",
+      "committer_date": "2026-10-17T10:45:16+08:00",
+      "subject": "Record native letter acceptance and all paired voice trial results"
+    },
+    {
+      "source_commit": "d251efaa27d09efa8ff42035d58a1717ae9a547e",
+      "committer_date": "2026-10-17T11:02:31+08:00",
+      "subject": "feat: add opt-in fictional demo account switching with real access boundaries"
+    },
+    {
+      "source_commit": "e9ad009001232dfd75915fe1bb6ad830d6aa4f4a",
+      "committer_date": "2026-10-17T11:21:42+08:00",
+      "subject": "Keep voice conversation history and isolate the Chen demo accounts"
+    },
+    {
+      "source_commit": "2535cc8c2e338bb751615a33dc9b92c86b69311f",
+      "committer_date": "2026-10-17T11:33:03+08:00",
+      "subject": "fix: keep new voice topics independent and bound social replies"
+    },
+    {
+      "source_commit": "f9b927bdeadb8d1ad294ee08e29c85a8e6f8ced9",
+      "committer_date": "2026-10-17T11:37:55+08:00",
+      "subject": "fix: ground persona identity questions in recorded biography"
+    },
+    {
+      "source_commit": "17fb424094a94c5b6fb989540615fea45b1ffefc",
+      "committer_date": "2026-10-17T12:18:19+08:00",
+      "subject": "fix: retrieve authorized self introductions for name questions"
+    },
+    {
+      "source_commit": "b64d58b022ef6b219c4ca6b0c02363898b1cb69e",
+      "committer_date": "2026-10-17T12:28:50+08:00",
+      "subject": "docs: record continuous voice and demo isolation acceptance results"
+    }
+  ],
+  "changed_source_files": [
+    {
+      "path": "apps/android/app/build.gradle.kts",
+      "mode": "100644",
+      "git_blob": "a14720cfba5eb6b7812f1632cf92a208e25b2805",
+      "sha256": "89e0913180510c277d04dab24036cbbdd539877a86cbaf35c538294c55104d66"
+    },
+    {
+      "path": "apps/android/app/src/androidTest/java/me/remember/app/ContinuousVoiceLiveTest.kt",
+      "mode": "100644",
+      "git_blob": "98af5a93e5305b3ec8b5c6dea65a2c3710b82379",
+      "sha256": "9d014a8726627764ca16bb4c6122c03eb8bb678544aedbff835073c51167c17a"
+    },
+    {
+      "path": "apps/android/app/src/androidTest/java/me/remember/app/DemoAccountsLiveTest.kt",
+      "mode": "100644",
+      "git_blob": "9f7d695bbe55deff076b7114535585e13b3c9085",
+      "sha256": "634b6558a811e3bed1f952a1a73b72a53b62fab0aa1cd221b95f943e1c3fe3aa"
+    },
+    {
+      "path": "apps/android/app/src/androidTest/java/me/remember/app/EntrustedLetterVisualTest.kt",
+      "mode": "100644",
+      "git_blob": "c8d9d608306e49a3dbdbc6ddf9c8bd4455142e5e",
+      "sha256": "f05b8d1e46b7aeda89fdb57fc03ca02fb45c3180e62b1888ad22e4934bb8dd13"
+    },
+    {
+      "path": "apps/android/app/src/androidTest/java/me/remember/app/VoiceExperienceTest.kt",
+      "mode": "100644",
+      "git_blob": "351d853a4813f42891ba55fe0757950fab913c20",
+      "sha256": "f704a9de2cf11f957da9988ef4e2de9ee99a9b9cee3e642355c4fe2d17cc256a"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/AppSettingsScreen.kt",
+      "mode": "100644",
+      "git_blob": "b2cca44513f14ad1dac4e14004657979b8abbffa",
+      "sha256": "a523ff4780d402a0dd0b42f4274176463433eb266050f8166b19de2aefc3315e"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/CompanionScreen.kt",
+      "mode": "100644",
+      "git_blob": "9e88b4e442c63fea8708c107edc80b850f7e934a",
+      "sha256": "e48d4a1947592dc1c408c09e8bc116b94d826d0420c0e28a89f0d6bf2d85c28f"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/ContactEntrustmentScreen.kt",
+      "mode": "100644",
+      "git_blob": "0e39e1c7544dd7c075adfd75e23cedd97dc9156f",
+      "sha256": "4df29aca7b0b361168bbb83e46e447938348f348d0120df0dda1cdfca7512b64"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/DemoAccountPanel.kt",
+      "mode": "100644",
+      "git_blob": "fcfc90ee09dcfd349a44cad2e9405857c89f406c",
+      "sha256": "baad6334eb179e3e36607327bd8132122a3198a7c72c270c2413e71a2931e0db"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/EntrustedLetterSheet.kt",
+      "mode": "100644",
+      "git_blob": "53357c1304ab78c7251dc7846881c92037153319",
+      "sha256": "cdb1c42c79231193d072e387c29a51d7a986e6cf980beb4c4109891cf8b41316"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/MemoryGardenScreen.kt",
+      "mode": "100644",
+      "git_blob": "7acebbdea2ee43bb8de4e3e5075f92232a85597d",
+      "sha256": "b98eadb9787f4e2a1f9b7af62c78e30929e02ca5a97b63e3aac2d0daa9d437f2"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/NativeWorkbenchModel.kt",
+      "mode": "100644",
+      "git_blob": "e9eed1f67040fc23714a44b9dc3f0df7baf2e005",
+      "sha256": "9131b12c998781dc8246e4fafdeb6102695fdc5408b32766a68f0b2dcfa1df8d"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/NativeWorkbenchScreen.kt",
+      "mode": "100644",
+      "git_blob": "e6a7c7cb0af0db8fd001f9e6de68ee5fa61ed683",
+      "sha256": "eafd65d13ac7f29ce20be993f054be5d3eace418eccd63db88ebc9a7790124f3"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/SavedSession.kt",
+      "mode": "100644",
+      "git_blob": "675ecd013695f2f2fe1ff62f7c9cbbd2f2eaed17",
+      "sha256": "57ca758e8ad02d23207c6de168076db98d1303943d4cafdbc8e58135c9242351"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/VoiceCallContent.kt",
+      "mode": "100644",
+      "git_blob": "3fc3f6ecb1804a2aea3d40239836082491f81eeb",
+      "sha256": "d00a1d5088afd2eb12ffac4930e9ab793527d4142d2a4a24db730ee5cba082d7"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/VoiceCallEngine.kt",
+      "mode": "100644",
+      "git_blob": "39d2245121ec881259e416451b833db35db7610b",
+      "sha256": "a79b82bab62beede5785dc7d0e0fa16a90b074fbf6107996ab92872b24e9efb0"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/VoiceCallScreen.kt",
+      "mode": "100644",
+      "git_blob": "564d7ee0b3590c0f6ba5a14a8f4a3edad6d23ced",
+      "sha256": "bc198d6709c66d42451007c3d26e5a2a25fd4007c25dd50575fac094ea944f18"
+    },
+    {
+      "path": "apps/android/app/src/main/java/me/remember/app/integration/VoicePresentation.kt",
+      "mode": "100644",
+      "git_blob": "b1bc06c3b7122185df7147d8eff7097fa275911d",
+      "sha256": "5c5fd42551cc1fe8e2b1a275050359fa9b02ea9ced18eac76fb19d6c43371bdf"
+    },
+    {
+      "path": "apps/android/app/src/test/java/me/remember/app/integration/ContactEntrustmentTest.kt",
+      "mode": "100644",
+      "git_blob": "f4548cac2bf9a4616fa50576bb5b53acffaced8b",
+      "sha256": "5eb9cb0675738a29c09a94c1c545f03efefad3b79a8f89f5a31ab1da1b9983dd"
+    },
+    {
+      "path": "apps/android/app/src/test/java/me/remember/app/integration/VoicePresentationTest.kt",
+      "mode": "100644",
+      "git_blob": "465fc037fb7cb1e2229617b80ab049b28d4ab82c",
+      "sha256": "2a4ef0681ca3c656c020ec019e57f135e26ab177307437cec5b7c88fbd55a308"
+    },
+    {
+      "path": "docs/architecture/contact-entrustment-20261017.md",
+      "mode": "100644",
+      "git_blob": "f48980b4ee8b18cf916254366558598765213a9b",
+      "sha256": "e992b8ccf13e75c38bf5c4578ea254710a26d49b5616ae58c99c1989fc35a92b"
+    },
+    {
+      "path": "docs/architecture/demo-account-switch-20261017.md",
+      "mode": "100644",
+      "git_blob": "7847ad72563ba2e29d832a77635740b90947a88c",
+      "sha256": "9bcecb11225804ad936d75aef0b137eabf3158ab4a6450d11c5146d6d5691160"
+    },
+    {
+      "path": "docs/architecture/entrusted-letter-native-validation-20261017.md",
+      "mode": "100644",
+      "git_blob": "61bddd4f362565301644682ac628287e62a1a497",
+      "sha256": "ef72759ec5651eb7bc660342f1cc676ea3573a4ea132785a737f6d3997bb1800"
+    },
+    {
+      "path": "docs/architecture/twin-entrusted-recall-20261017.md",
+      "mode": "100644",
+      "git_blob": "059d30678b890c610aef64844d48fc494e283935",
+      "sha256": "4197efdf812e73584d5c48a86d7ab61ff8f05ce5aa2c6440cf774bc254c476d6"
+    },
+    {
+      "path": "docs/architecture/voice-conversation-clean-demo-20261017.md",
+      "mode": "100644",
+      "git_blob": "e1d4fec7bf8fc603a8e39039c762f625ff7487f7",
+      "sha256": "f853dd235c7d21767c5233dca3bf6687add11241fa3b47014205b0a5f5840756"
+    },
+    {
+      "path": "docs/plans/2026-10-17-chen-demo-latency.md",
+      "mode": "100644",
+      "git_blob": "d9b4cbbd76a6072cfa7b8f116c32310136e8376b",
+      "sha256": "b826924b40abba9703ef364c939777efaf26a6ab27000983e3ce82820a469d65"
+    },
+    {
+      "path": "docs/team/CONTACT_ENTRUSTMENT_HANDOFF_20261017.md",
+      "mode": "100644",
+      "git_blob": "e0d6d9430af6bd75676a4f8ed8e3e5ab0df690a6",
+      "sha256": "c0e3462df396ef0548fe02de3bd1331deaa53e8ba536ec973ce6896dbbec67f7"
+    },
+    {
+      "path": "docs/validation/2026-10-17-voice-demo-cleanup.md",
+      "mode": "100644",
+      "git_blob": "6b7e2eb4c4be05bc7932dac6325516ce95851398",
+      "sha256": "b869f3eefecab94a011b5da2d34f79b0c6a9dc0101013e13ddd0f75b8baa3a34"
+    },
+    {
+      "path": "docs/verification/chen-demo-voice-20261017.md",
+      "mode": "100644",
+      "git_blob": "26408203ff6eca6269293629637b42dcad620dd4",
+      "sha256": "69aa2460d00e26b01ff92cd2d9dea9cb6ef0fafd753537977d9e79180bcc4cd0"
+    },
+    {
+      "path": "evaluations/chen-demo-20261017/character.json",
+      "mode": "100644",
+      "git_blob": "76762f13a6cf9bb941df46e57290fd610ad4737a",
+      "sha256": "899ceb3429ee20a1a7d9210e5003852db30fa5ffee152539f475e7d6bbc18cc9"
+    },
+    {
+      "path": "evaluations/chen-demo-20261017/entrusted-story.json",
+      "mode": "100644",
+      "git_blob": "7995aded1191fe2bb8a6f833ed3db1d0168f71af",
+      "sha256": "4eb2e34dff4601def9c4ae521d159e7ac3c1314a826880136f587eb556395d7d"
+    },
+    {
+      "path": "evaluations/chen-demo-20261017/final-metrics.json",
+      "mode": "100644",
+      "git_blob": "af30cc3e777c888ff55c0af5aee03bb0f247cb45",
+      "sha256": "a3b300be5297b6e001ab1562bd3cf1154c5ef972e4bf4e145addf2eaeb2939c6"
+    },
+    {
+      "path": "packages/contracts/README.md",
+      "mode": "100644",
+      "git_blob": "04eaa8f7cbfc4930393114a14996f8b1f785e920",
+      "sha256": "1633905b48798f54169f8bfe0ced2950e7a1d633814735b368ae93a5765c50b9"
+    },
+    {
+      "path": "packages/contracts/schemas/contact-entrustment-v1.schema.json",
+      "mode": "100644",
+      "git_blob": "88863253eb3be7dea8b1faa4ebd2fac7d2611947",
+      "sha256": "1507a0befcd239869417bf1134ea7df2a07d7af5c60ed3700ec4ef45df66b21b"
+    },
+    {
+      "path": "packages/contracts/schemas/twin-recall-v1.schema.json",
+      "mode": "100644",
+      "git_blob": "da33f67e2c5748aa409694e3a16afb1af257e8e2",
+      "sha256": "42cb5917d6a64a42a91df221a1d0b428f1a33faf621582787276a2042f97b4ae"
+    },
+    {
+      "path": "packages/contracts/test/contact-entrustment.test.mjs",
+      "mode": "100644",
+      "git_blob": "ae6c9136fcf38e1b978e8589a2558b11fccb68ef",
+      "sha256": "c255bb18f50cbee485e105351691ffcd044e89f1e8c0d02047c43eea1556df68"
+    },
+    {
+      "path": "services/ai-core/app/api.py",
+      "mode": "100644",
+      "git_blob": "779e41defcef431c45a74ff9c5f4baf72a1c6cb8",
+      "sha256": "26e0ac666226ea09a65672cae09f7425bc1db35dfdd1d513c3064afb25cffc73"
+    },
+    {
+      "path": "services/ai-core/app/config.py",
+      "mode": "100644",
+      "git_blob": "42b232a3dea75c40b0194105aa6931e7b09263a3",
+      "sha256": "4073b3c8a194bbbeea1725cdce17608c6371d338c3f746bb7ab1c5d28449d47d"
+    },
+    {
+      "path": "services/ai-core/app/conversation.py",
+      "mode": "100644",
+      "git_blob": "54c6d9a4db901e789ec575f8254834deb4b75890",
+      "sha256": "56101b04fdede662f28251039bffd8b38522ba5dbbd09e1470729b0fc034e472"
+    },
+    {
+      "path": "services/ai-core/app/conversation_style.py",
+      "mode": "100644",
+      "git_blob": "0e9eb37124fe59c0f7257b1782c5b12cbefb4ed7",
+      "sha256": "698f9a380243680a24478babe6b3e5911fa52b58f260db7a2d4127e125ab37b8"
+    },
+    {
+      "path": "services/ai-core/app/persona.py",
+      "mode": "100644",
+      "git_blob": "36f6666fb8863d4b8d07eb0973c11e011ffee0c2",
+      "sha256": "d20b0116170b9388922f10e555a3ed49b5c71b18017a3bbbfcabf72b74ba5312"
+    },
+    {
+      "path": "services/ai-core/app/providers/weixin.py",
+      "mode": "100644",
+      "git_blob": "a8f47f7deb892f2a0668a97467de92d67fb1f067",
+      "sha256": "31b22fc2c1bbce9718ce9be24d149fcd74b58d1edddc06854883f152dfd8111f"
+    },
+    {
+      "path": "services/ai-core/app/quoted_twin.py",
+      "mode": "100644",
+      "git_blob": "df218376cb1b2e1c75a532fd0bc0311d88bc64c6",
+      "sha256": "e1bf7bab4a8995854146f2b966cab272793f2bb4b32ae657b088b75ff0c42306"
+    },
+    {
+      "path": "services/ai-core/tests/test_conversation.py",
+      "mode": "100644",
+      "git_blob": "49db4be442770a4d4296c3a315ae39203c5279e8",
+      "sha256": "9371cec51a96552026de5c1b998600f641a4f0b4d6b27071b89fcc366ffd1e50"
+    },
+    {
+      "path": "services/ai-core/tests/test_conversation_style.py",
+      "mode": "100644",
+      "git_blob": "674d22e4d2340d3df0fcbcca373fcd906833fe63",
+      "sha256": "7b1f16b629cbde8c7e482d8e9500a1d8463356b9f6b63a73e86c274aab012e5b"
+    },
+    {
+      "path": "services/ai-core/tests/test_persona.py",
+      "mode": "100644",
+      "git_blob": "574ae5deb9ea1bc57d55cc1fe9134abae1f0eae3",
+      "sha256": "00195f43740cc1c0837e8106689d6a89363258ad8016b0823c6dc05554fce1ba"
+    },
+    {
+      "path": "services/ai-core/tests/test_persona_voice_review.py",
+      "mode": "100644",
+      "git_blob": "628c6c8b0712364696f0dfb96796e4752cae2ae1",
+      "sha256": "750579f1b0c0b12f677960e9f0aeab494ea5023e1b525ef12d4c16f7de2d169e"
+    },
+    {
+      "path": "services/ai-core/tests/test_quoted_twin.py",
+      "mode": "100644",
+      "git_blob": "60dd14bd8b90fad383fa87c4008c0319f7e06a1e",
+      "sha256": "6582513daf6ad8840817cb8212d2dc03283a4323e9d3c4c7b764fc6b25be59f0"
+    },
+    {
+      "path": "services/ai-core/tests/test_reviewed_hedge.py",
+      "mode": "100644",
+      "git_blob": "f5a52316b4725073b34e3ed05ebe9b067f4b7f64",
+      "sha256": "856f9b075663b9fe9886a328e905684b20a420fea1623d428578114bbafbf84f"
+    },
+    {
+      "path": "services/ai-core/tests/test_voice_time_scope.py",
+      "mode": "100644",
+      "git_blob": "689b80ccc8e90cf1daef3ee5a6c989a8daadf4d3",
+      "sha256": "8d0421ab0fed843daf675bb04fe7e21088f8e0e40cbc31f6450b40c2be724499"
+    },
+    {
+      "path": "services/backend/.env.contact.example",
+      "mode": "100644",
+      "git_blob": "0bd4d00b633be3cbce269b581837501ae473c3b6",
+      "sha256": "20f9124fac2bf021b1ae9f9371b1c0ceeecee9902d60909ed12e0a50a0ea4f62"
+    },
+    {
+      "path": "services/backend/.env.example",
+      "mode": "100644",
+      "git_blob": "4e63bc3b081cd3e19793fca6ec80232e896c4acd",
+      "sha256": "81992716a5a871267089a79c7069ca1cc889d1e2ab14734f3eb626fded7179db"
+    },
+    {
+      "path": "services/backend/app/api/accounts.py",
+      "mode": "100644",
+      "git_blob": "c32a3a13e540baf59ae35aad4e448dfbb310d78a",
+      "sha256": "0620dc2d6b394135b0d75995dd56e6759d62e58d5be049b562bf405ab25a2657"
+    },
+    {
+      "path": "services/backend/app/api/companion.py",
+      "mode": "100644",
+      "git_blob": "bd0a6b57b6f36ba853cb5a3d1aa981df7e4b8bcd",
+      "sha256": "0a63c5330880f9773e695a3ecc98d8a1d9b0097b515d76d08fe7a5f56d99065d"
+    },
+    {
+      "path": "services/backend/app/api/companion_audio.py",
+      "mode": "100644",
+      "git_blob": "b0c45cf655350ad41744510380739b0aa87e758f",
+      "sha256": "f7a1c6444d1952338add0d75d497eb0da9bdc0e6c8210ef350dd30ead8542754"
+    },
+    {
+      "path": "services/backend/app/api/contact_entrustments.py",
+      "mode": "100644",
+      "git_blob": "57d249470c20ee638e7c7bf1848a6274d54e15cd",
+      "sha256": "2d1437d581adc402b45b82e8d9571434df100770183759dc183a3ad428816790"
+    },
+    {
+      "path": "services/backend/app/api/twin.py",
+      "mode": "100644",
+      "git_blob": "f6a7ddd644c11273be8a60fa9f4e8ce41b5ba666",
+      "sha256": "18597b0a121100c04045c66ab7c7c422719e1aba3573116035fb405b7f31537b"
+    },
+    {
+      "path": "services/backend/app/api/voice_sessions.py",
+      "mode": "100644",
+      "git_blob": "6db00f55fd99d116de92189e9b1eccd952f64418",
+      "sha256": "e69fee73e3f68a37cc36819077c56ded90ae7c375760ba1ab9932178407cee4e"
+    },
+    {
+      "path": "services/backend/app/api/workbench.py",
+      "mode": "100644",
+      "git_blob": "b9880527895c0b5c429e71daa5cf23549c617d7a",
+      "sha256": "7de5d06c28e3acf7a017f989b6d919bf55a4493a14fad920ffdc4ab56981627f"
+    },
+    {
+      "path": "services/backend/app/companion_models.py",
+      "mode": "100644",
+      "git_blob": "c697545b681dc14653afe3fe1477f5c461b067a5",
+      "sha256": "ab1daeb2888ceb1046f8a64700ddc887d1fee8166b8f459c5150e030ba825531"
+    },
+    {
+      "path": "services/backend/app/config.py",
+      "mode": "100644",
+      "git_blob": "af7c446c04ad2beaf94e091e7910b0926914c703",
+      "sha256": "c7ca921203fa02d8659fde087f666fa1b0078453b308ccfce1724cdd3bc5e774"
+    },
+    {
+      "path": "services/backend/app/contact_delivery.py",
+      "mode": "100644",
+      "git_blob": "1d9a7dd88991bc5fb3eb8530098b7768be41b8a0",
+      "sha256": "7e7ebb7ccf90b0dd30b11030defc85f4b091acb5cecc2a82388c9a1d43fcb00c"
+    },
+    {
+      "path": "services/backend/app/contact_entrustment_models.py",
+      "mode": "100644",
+      "git_blob": "00804ae5f9884aa40840c28fc1efb0f8f331f41f",
+      "sha256": "0b1de6f26150aff77faf73caaf626f07405caa3158cda06bb4252acd8141303d"
+    },
+    {
+      "path": "services/backend/app/demo_accounts.py",
+      "mode": "100644",
+      "git_blob": "1d164d9848ffb8214f122352c40b1398d688f0c6",
+      "sha256": "9993e650a60576df975765825c8285de4ed950697bb695b597576b289e9bbc71"
+    },
+    {
+      "path": "services/backend/app/entrusted_recall.py",
+      "mode": "100644",
+      "git_blob": "4d484214a0e10b92b39ab2e46f5738ca1206fa50",
+      "sha256": "e9232ef135282d33a698e4abdd384837483d99faca9d0235ac7d95373baf082d"
+    },
+    {
+      "path": "services/backend/app/main.py",
+      "mode": "100644",
+      "git_blob": "e38c018940c22efa9a19f5e4808099f13e73edb1",
+      "sha256": "bdd5c6f86cece07feddd490c91b3ed293c856c7a6f60295405ad0571b483d667"
+    },
+    {
+      "path": "services/backend/app/rag_contract.py",
+      "mode": "100644",
+      "git_blob": "a6fcb615f1647f51c1a6cbe3f1e3295b74909825",
+      "sha256": "dec8d1a28ad7563f3f4831567446ee5ffc0e65132861ed7d49135a8971b3499d"
+    },
+    {
+      "path": "services/backend/app/realtime_providers.py",
+      "mode": "100644",
+      "git_blob": "e368331a2483a8e52c6d2234619539320e413cc0",
+      "sha256": "4bb03197588cac0e200fcf888d255bb668b0241666eb8c86fff1136f430a4c89"
+    },
+    {
+      "path": "services/backend/app/receive/envelope.css",
+      "mode": "100644",
+      "git_blob": "7bfb3f431dbe89377d63e70f7467cd1fa2caa17e",
+      "sha256": "20de56264bb3985aeaf9c5475aa23ed6ad885134ff63f7eee94e88f0139a6471"
+    },
+    {
+      "path": "services/backend/app/receive/index.html",
+      "mode": "100644",
+      "git_blob": "f417ffc2b54053cc24972f108ce061a36ac2e695",
+      "sha256": "521be0db9f4ee620646274ea26a69be07163b3fc4d21de1f99bb09212ae77333"
+    },
+    {
+      "path": "services/backend/app/receive/receipt.css",
+      "mode": "100644",
+      "git_blob": "983b2ebb88d3d54fc89567ff3a864260f9a5b117",
+      "sha256": "486ab8e46fc41b14002ec6cf77f0fb4c5ec1208bb4df6c6ed702678c3125dd79"
+    },
+    {
+      "path": "services/backend/app/receive/receipt.js",
+      "mode": "100644",
+      "git_blob": "3969daf22bc8dc6032166e024a74b686e09f4a83",
+      "sha256": "20321ffd2bee60b21c197f66ad7f917fc0f4099ab520f39f24fbe30c5cd86941"
+    },
+    {
+      "path": "services/backend/app/retrieval.py",
+      "mode": "100644",
+      "git_blob": "c772c63e090f0981a4301abaa0e836eb86d289fd",
+      "sha256": "339b6395fc152642d8a7b35ae48993d0193993790bb51d6665cd9b5309225a8c"
+    },
+    {
+      "path": "services/backend/app/voice_query.py",
+      "mode": "100644",
+      "git_blob": "f8f27e2596b64c4d5d8d57a5f21f0920af589326",
+      "sha256": "6ed2f56800561e468a53d2b77f73a003c1800dddfd04c8981a0ecdc34f1e93b3"
+    },
+    {
+      "path": "services/backend/app/voice_turns.py",
+      "mode": "100644",
+      "git_blob": "2038010d696431ef919740c3a8f5e6e3e61047ce",
+      "sha256": "7d2ccfcc4be4df1933695bb11b8ba912de960e177cd164a91b612cb69b079587"
+    },
+    {
+      "path": "services/backend/migrations/env.py",
+      "mode": "100644",
+      "git_blob": "5087bf86be01d9122b3cb784830b5312d33c6195",
+      "sha256": "1b59e270ccb45f03fc2dc68668e35ac94ae65ebda78e8486af77368fbb0b8510"
+    },
+    {
+      "path": "services/backend/migrations/versions/0022_contact_entrustments.py",
+      "mode": "100644",
+      "git_blob": "582e4ce5fd10905c0d267f66491a9da43ba6e3a0",
+      "sha256": "7db2c576b5bd06e18111a1b676f55449b11390a5445365c916bc553fb3fcf732"
+    },
+    {
+      "path": "services/backend/migrations/versions/0023_letter_recall.py",
+      "mode": "100644",
+      "git_blob": "3c8ba928dddce9df4bef0499717cfd925f6b6e16",
+      "sha256": "52d4880b647fa34ebffefcd0e78945e80d31c7cdc34cb7241e01f83d23ca8653"
+    },
+    {
+      "path": "services/backend/pyproject.toml",
+      "mode": "100644",
+      "git_blob": "77eba8f06ef8a72f67f9667e6abf193f3d6d5646",
+      "sha256": "4b8b88bfdd4a89d6abca139bfbdd920ea4a4c692fbdcb94b246dc86c3ed26831"
+    },
+    {
+      "path": "services/backend/tests/receipt-ui.test.cjs",
+      "mode": "100644",
+      "git_blob": "0eef1ba3a9a85d20caee0a76f268f3f0dfcffa4e",
+      "sha256": "5226137a322092b849266b1d73d8b0f903ff73faeb3e2bfac4d1c062c213ee0f"
+    },
+    {
+      "path": "services/backend/tests/test_companion_audio.py",
+      "mode": "100644",
+      "git_blob": "b8ffb72a58ad49623ad64f85d5bc42f14754b432",
+      "sha256": "84e3c22abadccdf2dd4b8ff68accc3d49a1bcd4bc89ba78bbc92ecd089ad1eb5"
+    },
+    {
+      "path": "services/backend/tests/test_contact_delivery.py",
+      "mode": "100644",
+      "git_blob": "b53327722bb9488e5152cbf8beee9a88d626f1c1",
+      "sha256": "de1ef61a780ed899728fd5524994153512ac402b3d59a478bc821bbfd654c9fd"
+    },
+    {
+      "path": "services/backend/tests/test_contact_entrustment.py",
+      "mode": "100644",
+      "git_blob": "1bc3665b25d663cdd87395bd21db8149c7b4c46a",
+      "sha256": "a6004ef0bef71a88fe8657bcc8ccce4a0ccd27698b3bbc5eac2f1e305bb98ddb"
+    },
+    {
+      "path": "services/backend/tests/test_demo_accounts.py",
+      "mode": "100644",
+      "git_blob": "3766521e05927e0464af63bfe5e5111fa23449e8",
+      "sha256": "949bd72ed75876d18929f8d4ad45b347a6c5e3af80b0cafea6043b303c86e547"
+    },
+    {
+      "path": "services/backend/tests/test_entrusted_recall.py",
+      "mode": "100644",
+      "git_blob": "b408f9c36465427b2e789395ee98fc86cbd3712c",
+      "sha256": "843d7f6f719a87da1c0d641628a5162c8cf4a923d13cd9efdc042374e4a150f4"
+    },
+    {
+      "path": "services/backend/tests/test_rag_contract.py",
+      "mode": "100644",
+      "git_blob": "b4041abb13a0649a405adafa9f831156d22333d5",
+      "sha256": "d4ad005c643ebd55b0400bbc8f0aefac21996a791475ecf83bbc6caa12b43ecf"
+    },
+    {
+      "path": "services/backend/tests/test_twin_context.py",
+      "mode": "100644",
+      "git_blob": "9f7813ce3df7dda7acc0f281a87d5b099b0ea618",
+      "sha256": "88ba169caef20173d2f67cee423410694d78b8374d18036ebdf1397d71c2c8b5"
+    },
+    {
+      "path": "services/backend/tests/test_twin_rag_integration.py",
+      "mode": "100644",
+      "git_blob": "112d15a5826c90049007cc08027d5ca86a508eee",
+      "sha256": "2a500420f98b9ab0437cdf086660f35815d786d633eb723af62cb62c2da1c4d6"
+    },
+    {
+      "path": "services/backend/tests/test_voice_optimization.py",
+      "mode": "100644",
+      "git_blob": "629ac7bdc51747d06d7296b618c3dc14918666bb",
+      "sha256": "7276ee4352b430dfab62d125c2b551d5b18b471eafeff9d958fe563ef142953f"
+    },
+    {
+      "path": "services/backend/tests/test_voice_turns.py",
+      "mode": "100644",
+      "git_blob": "a0524a1a178addc08eb92ccb2e0db2c063e4fa94",
+      "sha256": "e75d9dae52eeda806f199da72576f60a93ff349c5ac4a74dd45f25121faaff29"
+    },
+    {
+      "path": "services/backend/uv.lock",
+      "mode": "100644",
+      "git_blob": "0f0dcc0a927d6ffb0a845dbcf03ebbc05828d9df",
+      "sha256": "cff9fb325153cc388a9be4d2ecaf8087e25b505835fe8724f8ed0cdd52f61cbf"
+    },
+    {
+      "path": "tools/voice_call/record_app_pcm_demo.py",
+      "mode": "100644",
+      "git_blob": "fccf5acd9baadd1a9244b32209b634175ceab28a",
+      "sha256": "fc8ac70f29d65e1d3ddcd6aae51d46e047eec8a0c2b6e21b7865d4b6e618edb1"
+    },
+    {
+      "path": "tools/voice_call/render_app_pcm_demo.py",
+      "mode": "100644",
+      "git_blob": "9475f5c48c7e96345a325cc3485bb3c75389dc72",
+      "sha256": "ed79a6bb8c9f56c28b9e5ffbd44a2b8fd2b75c014ea30f968b47b745cf72b47d"
+    }
+  ],
+  "documentation_overlays": [
+    "README.md",
+    "apps/android/README.md"
+  ],
+  "integration_test_updates": [
+    {
+      "path": "services/backend/tests/test_migrations.py",
+      "integrated_sha256": "221472627dbc18c05e7c6bf583a3bc3ce9b608fb5ca18311f5985569eea3cb96"
+    },
+    {
+      "path": "services/ai-core/tests/test_conversation_style.py",
+      "integrated_sha256": "c1c96eaa9d893b31d134017e5755f53fcad2f85afb339554d99ebe4614258d97"
+    },
+    {
+      "path": "services/ai-core/tests/test_persona_author_prefix.py",
+      "integrated_sha256": "d2b0b61702c5a9d0a16c183e85328fce50e1d29405b65cbffafce04f50b27b5b"
+    },
+    {
+      "path": "services/ai-core/tests/test_voice_original_proposal.py",
+      "integrated_sha256": "772ff44c34cef3d2a3cc245f72fab78092944c7af19f40da0ec0f7ce0115c2d6"
+    }
+  ],
+  "integration_verification": {
+    "android": {
+      "tests": 156,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "backend": {
+      "tests": 794,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    "ai_core": {
+      "tests": 576,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "contracts_passed": 17,
+    "receipt_ui_passed": 4,
+    "migration_head": "0023_letter_recall",
+    "apk_version_code": 20261037,
+    "apk_version_name": "0.16.7-device-internal-local-review-20261013",
+    "apk_sha256": "6dd5bed780afc6963e8f7c4e6d957f87b52ce8f7198979234ad7be1e3f19d940",
+    "private_hardware_sdk": false,
+    "real_device_checks": false,
+    "production_deployment": false
+  }
+}

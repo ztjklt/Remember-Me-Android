@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.media.AudioTrack
 import android.os.ParcelFileDescriptor
 import androidx.compose.ui.test.*
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -41,16 +42,25 @@ class ContinuousVoiceLiveTest {
         try{
             scenario.onActivity{model=ViewModelProvider(it)[NativeWorkbenchModel::class.java]}
             ui.waitUntil(90000){!model.ui.value.busy}
-            ui.runOnIdle{if(model.ui.value.actor.isNotBlank())model.logout()}
-            ui.waitUntil(30000){model.ui.value.actor.isBlank()}
-            ui.onNodeWithText("账号").performTextReplacement(config.getString("username"))
-            ui.onNodeWithText("密码（至少8个字符）").performTextReplacement(config.getString("password"))
-            click("登录");ui.waitUntil(90000){!model.ui.value.busy&&model.ui.value.actor.isNotBlank()}
+            if(BuildConfig.DEMO_ACCOUNTS) {
+                ui.runOnIdle{model.enterDemo("relative")}
+                ui.waitUntil(90000){!model.ui.value.busy && model.ui.value.demoRole=="relative"}
+            } else {
+                ui.runOnIdle{if(model.ui.value.actor.isNotBlank())model.logout()}
+                ui.waitUntil(30000){model.ui.value.actor.isBlank()}
+                ui.onNodeWithText("账号").performTextReplacement(config.getString("username"))
+                ui.onNodeWithText("密码（至少8个字符）").performTextReplacement(config.getString("password"))
+                click("登录");ui.waitUntil(90000){!model.ui.value.busy&&model.ui.value.actor.isNotBlank()}
+            }
             val space=model.ui.value.spaces.single{it.text("subject_id")==config.getString("subject_id")}
             if(model.ui.value.subject!=space.text("subject_id"))ui.runOnIdle{model.selectSpace(space)}
             ui.waitUntil(90000){!model.ui.value.busy&&!model.ui.value.spaceChoiceRequired}
             inst.uiAutomation.executeShellCommand("pm grant ${context.packageName} android.permission.RECORD_AUDIO").close()
-            click("对话");click("语音聊聊")
+            click("对话")
+            val voiceMode=InstrumentationRegistry.getArguments().getString("voiceMode","evidence")
+            if(voiceMode=="persona")click("与 AI 分身聊聊")
+            report.put("mode",voiceMode)
+            click("语音聊聊")
             val speed=InstrumentationRegistry.getArguments().getString("responseSpeed","reviewed")
             val voiceEngine=InstrumentationRegistry.getArguments().getString("voiceEngine","pipeline")
             if(voiceEngine=="step_realtime"){
@@ -113,7 +123,9 @@ class ContinuousVoiceLiveTest {
                 val appPcm=InstrumentationRegistry.getArguments().getString("appPcm")=="true"
                 val interruptDemo=InstrumentationRegistry.getArguments().getString("interruptDemo")=="true"
                 var interruptedTurn=-1L;var interruptionMarked=false
-                val demoRounds=InstrumentationRegistry.getArguments().getString("timingRounds","2").toInt().coerceIn(1,3)
+                val demoRounds=InstrumentationRegistry.getArguments().getString("timingRounds","2").toInt().coerceIn(1,8)
+                val continueOnError=InstrumentationRegistry.getArguments().getString("continueOnError")=="true"
+                var failedRounds=0
                 if(appPcm){
                     report.put("synthetic_microphone_injection",false).put("instrumented_app_pcm",true)
                     // Bypass only the emulator HAL. ASR, answer and TTS remain real.
@@ -121,7 +133,8 @@ class ContinuousVoiceLiveTest {
                     paused.setBoolean(engine,true)
                     val job=engine.javaClass.getDeclaredField("capture").apply{isAccessible=true}.get(engine) as? kotlinx.coroutines.Job
                     job?.cancel()
-                    (engine.javaClass.getDeclaredField("recorder").apply{isAccessible=true}.get(engine) as? android.media.AudioRecord)?.stop()
+                    // Cancellation may already have released AudioRecord in its finally block.
+                    runCatching { (engine.javaClass.getDeclaredField("recorder").apply{isAccessible=true}.get(engine) as? android.media.AudioRecord)?.stop() }
                     kotlinx.coroutines.runBlocking{job?.join()}
                     paused.setBoolean(engine,false)
                     val audio=(1..demoRounds).map{r->ParcelFileDescriptor.AutoCloseInputStream(inst.uiAutomation.executeShellCommand("cat /data/local/tmp/voice-demo-input-$r.pcm")).use{it.readBytes()}}
@@ -157,6 +170,7 @@ class ContinuousVoiceLiveTest {
                     mark("ready_for_question",round)
                     File(folder,"demo-ready-$round").writeText("inject synthetic question")
                     var transcript="";var answerSeen=false;var audioSeen=false;var completed=false
+                    var roundFailed=false;var priorErrorCleared=engine.ui.value.error.isBlank()
                     var lastAnswerText=""
                     val deadline=System.currentTimeMillis()+65000
                     var lastSample=0L;var lastProgress=0L
@@ -186,10 +200,15 @@ class ContinuousVoiceLiveTest {
                             transcript=s.transcript;mark("transcript",round,JSONObject().put("text",transcript))
                             ui.waitForIdle() // Compose test clock must render the actual state change.
                         }
-                        if(s.error.isNotBlank()){
-                            mark("error",round,JSONObject().put("message",s.error));fail(s.error)
+                        if(s.error.isBlank())priorErrorCleared=true
+                        if(s.error.isNotBlank()&&priorErrorCleared){
+                            mark("error",round,JSONObject().put("message",s.error));shot("demo-$round-error")
+                            if(!continueOnError)fail(s.error)
+                            failedRounds++;roundFailed=true;break
                         }
-                        val answerId=s.sources?.let{it.optString("answer_id").ifBlank{it.optString("live_turn_id")}}.orEmpty()
+                        val answerId=s.sources?.let{it.optString("answer_id").ifBlank{it.optString("live_turn_id")}.ifBlank {
+                            if(it.optString("response_type")=="CONVERSATION") "conversation:"+engine.javaClass.getDeclaredField("turn").apply{isAccessible=true}.getLong(engine) else ""
+                        }}.orEmpty()
                         if(answerId.isNotBlank()&&answerId!=previousAnswer){
                             if(!answerSeen||s.answer!=lastAnswerText){
                                 mark("answer_visible",round,JSONObject().put("text",s.answer).put("answer_id",answerId))
@@ -211,12 +230,53 @@ class ContinuousVoiceLiveTest {
                         }
                         Thread.sleep(25)
                     }
-                    assertTrue("Round $round did not complete playback",answerSeen&&audioSeen&&completed)
+                    assertTrue("Round $round did not complete playback",roundFailed||(answerSeen&&audioSeen&&completed))
                     if(!(interruptDemo&&round==1))Thread.sleep(1000)
                 }
                 if(interruptDemo)assertTrue("Local VAD did not stop the previous playing turn",interruptionMarked)
+                if(!interruptDemo&&demoRounds>1){
+                    val earlier=engine.ui.value.history
+                    assertTrue("Earlier call questions disappeared",earlier.size>=demoRounds-1)
+                    ui.onNodeWithTag("voice-history").performScrollToIndex(0)
+                    ui.waitForIdle();Thread.sleep(400)
+                    ui.onNodeWithText(earlier.first().question).assertIsDisplayed()
+                    shot("demo-history-retained")
+                    report.put("retained_exchanges",earlier.size+1)
+                    ui.onNodeWithTag("voice-history").performScrollToIndex(earlier.size)
+                }
+                if(InstrumentationRegistry.getArguments().getString("entrustedRecall")=="true"){
+                    assertEquals(0,failedRounds)
+                    val sources=checkNotNull(engine.ui.value.sources)
+                    assertTrue("Last real answer must have an authorized recall",sources.getJSONArray("recall_actions").length()>0)
+                    ui.onNodeWithTag("open-entrusted-letter").performScrollTo().performClick()
+                    ui.waitUntil(20000){model.ui.value.openedLetter!=null||model.ui.value.error!=null}
+                    assertNull(model.ui.value.error);assertTrue(engine.ui.value.paused)
+                    val letter=checkNotNull(model.ui.value.openedLetter)
+                    report.put("recall_letter_id",letter.getString("id"));shot("demo-letter-sealed")
+                    ui.onNodeWithText("轻触拆开").performClick()
+                    ui.onNodeWithText(letter.getString("title")).assertIsDisplayed()
+                    ui.onNodeWithText(letter.getString("author_display_name")).performScrollTo().assertIsDisplayed()
+                    shot("demo-letter-opened")
+                    ui.onNodeWithTag("letter-play").performScrollTo().performClick()
+                    ui.waitUntil(30000){model.ui.value.player.playing&&model.ui.value.player.duration>0}
+                    ui.waitUntil(10000){model.ui.value.player.position>500}
+                    val duration=model.ui.value.player.duration
+                    report.put("letter_audio_duration_ms",duration);shot("demo-letter-playing")
+                    ui.onNodeWithTag("letter-play").performClick()
+                    ui.waitUntil(10000){!model.ui.value.player.playing}
+                    ui.onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress)).performScrollTo().performSemanticsAction(SemanticsActions.SetProgress){it(duration*.5f)}
+                    ui.waitUntil(10000){kotlin.math.abs(model.ui.value.player.position-duration/2)<1500}
+                    shot("demo-letter-seeked")
+                    ui.onNodeWithTag("letter-play").performScrollTo().performClick()
+                    ui.waitUntil(10000){model.ui.value.player.playing};Thread.sleep(1500)
+                    ui.onNodeWithContentDescription("关闭信笺").performClick()
+                    ui.waitUntil(10000){model.ui.value.openedLetter==null&&!model.ui.value.player.playing}
+                    assertTrue(model.ui.value.player.episode.isBlank())
+                    report.put("authorized_recall_opened",true).put("real_audio_pause_seek_resume_close",true)
+                }
                 click("结束");ui.waitUntil(10000){model.voiceCall.value==null}
-                report.put("ok",true).put("timing_demo",true).put("events",events)
+                report.put("ok",failedRounds==0).put("failed_rounds",failedRounds).put("all_rounds_attempted",true).put("timing_demo",true).put("events",events)
+                assertEquals("Completed the batch but retained failed replies",0,failedRounds)
                 return
             }
             File(folder,"ready").writeText("inject synthetic question now")

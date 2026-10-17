@@ -1,14 +1,15 @@
 # Remember Me Android
 
-安卓团队独立开发仓库。当前源码版本 **0.16.4-device-internal / 20261034**，基于原仓库 `codex/work3200-device-20261016` 的 `7e72c7779207dae28e1333368d332acdc91d3fcc`（2026-10-17）。包含当前 Android 客户端及其配套 Backend、AI Core、共享 Contract、工具和交接材料。原单仓库目录保持，历史 iOS 文件仅作参考，后续 iOS 开发继续使用原仓库。
+安卓团队独立开发仓库。当前源码版本 **0.16.7-device-internal / 20261037**，基于原仓库 `codex/work3200-device-20261016` 的 `b64d58b022ef6b219c4ca6b0c02363898b1cb69e`（2026-10-17）。包含当前 Android 客户端及其配套 Backend、AI Core、共享 Contract、工具和交接材料。原单仓库目录保持，历史 iOS 文件仅作参考，后续 iOS 开发继续使用原仓库。
 
 - 客户端：[`apps/android`](apps/android/README.md)
-- 最新对话界面：[`VOICE_0164_UI.md`](apps/android/docs/VOICE_0164_UI.md)
+- 0.16.7 连续对话与演示身份：[`voice-demo-cleanup`](docs/validation/2026-10-17-voice-demo-cleanup.md)
+- 0.16.7 合入与部署说明：[`ANDROID_0167_MAIN_2026_10_17.md`](docs/verification/ANDROID_0167_MAIN_2026_10_17.md)
 - 语音核验、实测与已知超时：[`voice-reviewed-latency-20261017.md`](docs/verification/voice-reviewed-latency-20261017.md)
 - 新仓库来源、构建与验证：[`ANDROID_REPOSITORY_SNAPSHOT_2026_10_17.md`](docs/verification/ANDROID_REPOSITORY_SNAPSHOT_2026_10_17.md)
 - 协作要求：[`AGENTS.md`](AGENTS.md)、[`CONTRIBUTING.md`](CONTRIBUTING.md)；跨模块接口仍遵循 [`packages/contracts`](packages/contracts/README.md)。
 
-`main` 保存可用快照，`develop` 用于后续集成。新库采用独立 Git 历史，原提交与 PR 仍在 [原仓库](https://github.com/ztjklt/Remember-Me) 查询。下方为保留的历史交接记录，旧版本下载链接不代表当前 0.16.4 安装包。
+`main` 保存可用快照，`develop` 用于后续集成。新库采用独立 Git 历史，原提交与 PR 仍在 [原仓库](https://github.com/ztjklt/Remember-Me) 查询。下方为保留的历史交接记录，旧版本下载链接不代表当前 0.16.7 安装包。
 
 ## 快速构建
 

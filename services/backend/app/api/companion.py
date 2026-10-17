@@ -282,7 +282,9 @@ def letter_visible(row,session,actor):
 def letter_view(row,session,actor):
     if not letter_visible(row,session,actor): raise Hidden('留言不可访问。')
     view=metadata(row,'SUBJECT','recipient_only' if row.status=='published' else 'owner')
-    view.update(recipient_actor_id=row.recipient_actor_id,title=row.title,audio_id=row.audio_id if row.status!='revoked' else None)
+    author=session.get(Actor,row.author_actor_id)
+    view.update(recipient_actor_id=row.recipient_actor_id,title=row.title,audio_id=row.audio_id if row.status!='revoked' else None,
+        author_display_name=author.display_name if author else '')
     if row.status!='revoked': view['text']=row.text
     return view
 
@@ -337,6 +339,36 @@ def edit_letter(subject_id:str,id:str,body:LetterEdit,actor=Depends(current_acto
         row.audio_id=body.audio_id
         changed(row,actor.actor_id,'edit',body)
     session.commit();return letter_view(row,session,actor.actor_id)
+
+
+class RecallSelection(Revision):
+    evidence_ids: list[Identifier] = Field(max_length=32)
+
+
+@router.put('/letters/{id}/recall')
+def set_letter_recall(subject_id:str,id:str,body:RecallSelection,actor=Depends(current_actor),session=Depends(get_session)):
+    from ..companion_models import LetterRecallCue
+    from ..models import Evidence, Episode
+    publication_lock(session,subject_id);require_owner(session,subject_id,actor.actor_id)
+    row=resource(session,CompanionLetter,subject_id,id)
+    if row.status!='published' or row.revision!=body.revision:
+        raise SourceChanged('请先发布这封信，并重新读取当前版本。')
+    if len(set(body.evidence_ids))!=len(body.evidence_ids): raise RequestInvalid('来源不能重复。')
+    for eid in body.evidence_ids:
+        evidence=session.get(Evidence,eid)
+        episode=session.get(Episode,evidence.episode_id) if evidence else None
+        if episode is None or episode.subject_id!=subject_id: raise Hidden('来源不可用。')
+        from ..access import visible_episodes
+        if episode.status!='ready' or episode.episode_id not in visible_episodes(session,subject_id,actor.actor_id):
+            raise Hidden('来源不可用。')
+    from ..entrusted_recall import selected_source_basis
+    basis=selected_source_basis(session,subject_id,body.evidence_ids)
+    if basis is None: raise Hidden('来源不可用。')
+    cue=session.get(LetterRecallCue,id)
+    if cue is None: cue=LetterRecallCue(letter_id=id);session.add(cue)
+    cue.letter_revision=row.revision;cue.source_version=basis;cue.evidence_ids=list(body.evidence_ids)
+    session.commit()
+    return {'enabled':bool(cue.evidence_ids),'evidence_ids':cue.evidence_ids}
 
 
 class ModelUse(Revision):

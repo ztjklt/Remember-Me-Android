@@ -1,4 +1,4 @@
-> **2026-10-17 独立仓库：** 当前版本为 **0.16.4-device-internal / 20261034**。源码与后端配套快照、构建方法及本轮结果见[新库快照记录](../../docs/verification/ANDROID_REPOSITORY_SNAPSHOT_2026_10_17.md)，对话界面见[0.16.4 说明](docs/VOICE_0164_UI.md)。下方旧日期、版本和下载信息作为历史记录保留。
+> **2026-10-17 主分支更新：** 当前版本为 **0.16.7-device-internal / 20261037**，已同步连续对话、身份问答、演示账号隔离和亲友托付。来源、验证及数据库迁移见[0.16.7 合入与部署说明](../../docs/verification/ANDROID_0167_MAIN_2026_10_17.md)，实际语音边界见[0.16.7 验证记录](../../docs/validation/2026-10-17-voice-demo-cleanup.md)。下方旧日期、版本和下载信息作为历史记录保留。
 
 # Remember Me Android
 

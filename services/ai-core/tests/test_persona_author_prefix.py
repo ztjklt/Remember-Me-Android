@@ -27,7 +27,7 @@ def test_saved_actual_author_anchor_can_be_in_rendered_prefix(monkeypatch, repai
     assert response.status_code == 200, response.text
     assert len(chat.requests) == 2
     assert response.json()["contribution_ids"] == ["saved-c1"]
-    assert response.json()["prompt_version"] == "persona-conditional-reviewed-v8"
+    assert response.json()["prompt_version"] == "persona-conditional-reviewed-v9"
     scopes = chat.requests[1][1]["review_scope"]
     assert all(p["rendered_text"].startswith("A01 亲友体验的亲历观察（原文摘录）：『") for p in scopes)
     assert "A01 亲友体验" not in draft["points"][1]["text"]
