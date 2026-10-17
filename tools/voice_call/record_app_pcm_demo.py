@@ -7,7 +7,7 @@ def main(a):
     out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
     remote='/sdcard/Android/data/me.remember.app.internal/files/continuous-voice'
     def run(*args,**kw):
-        return subprocess.run([a.adb,'-s','emulator-5554',*args],capture_output=True,timeout=kw.pop('timeout',10),**kw)
+        return subprocess.run([a.adb,'-s',a.serial,*args],capture_output=True,timeout=kw.pop('timeout',10),**kw)
     assert not run('reverse','--list').stdout.strip()
     for i,source in enumerate(a.audio,1):
         path=out/f'question-{i}.wav'
@@ -26,14 +26,14 @@ def main(a):
                 stop.wait(.2)
             if stop.is_set():return
             if i==1:
-                video.append(subprocess.Popen([a.adb,'-s','emulator-5554','shell','screenrecord','--time-limit','180','--bit-rate','3000000','/sdcard/voice-app-pcm.mp4'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL))
+                video.append(subprocess.Popen([a.adb,'-s',a.serial,'shell','screenrecord','--time-limit','180','--bit-rate','3000000','/sdcard/voice-app-pcm.mp4'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL))
                 stop.wait(2)
             run('shell','touch',remote+f'/demo-start-{i}').check_returncode()
     watcher=threading.Thread(target=watch,daemon=True);watcher.start()
     try:
         result=run('shell','am','instrument','-w','-e','class','me.remember.app.ContinuousVoiceLiveTest',
             '-e','timingDemo','true','-e','appPcm','true','-e','timingRounds',str(len(a.audio)),
-            '-e','responseSpeed',a.response_speed,'-e','voiceEngine',a.engine,'-e','interruptDemo',str(a.interrupt_demo).lower(),'me.remember.app.internal.test/androidx.test.runner.AndroidJUnitRunner',timeout=240)
+            '-e','responseSpeed',a.response_speed,'-e','voiceMode',a.mode,'-e','continueOnError',str(a.continue_on_error).lower(),'-e','voiceEngine',a.engine,'-e','interruptDemo',str(a.interrupt_demo).lower(),'-e','entrustedRecall',str(a.entrusted_recall).lower(),'me.remember.app.internal.test/androidx.test.runner.AndroidJUnitRunner',timeout=240)
         (out/'instrumentation.log').write_bytes(result.stdout+result.stderr)
     finally:
         stop.set();watcher.join(5)
@@ -52,7 +52,11 @@ def main(a):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--adb',required=True);p.add_argument('--audio',action='append',required=True)
+    p.add_argument('--serial',default='emulator-5554',help='Explicit emulator/device target; keeps concurrent test runs isolated')
     p.add_argument('--output',required=True);p.add_argument('--response-speed',choices=['reviewed','fast','streamed'],default='fast')
     p.add_argument('--interrupt-demo',action='store_true')
+    p.add_argument('--entrusted-recall',action='store_true',help='After the last live answer, open its authorized letter and exercise real media playback')
     p.add_argument('--engine',choices=['pipeline','step_realtime'],default='pipeline')
+    p.add_argument('--mode',choices=['evidence','persona'],default='evidence')
+    p.add_argument('--continue-on-error',action='store_true',help='Attempt later rounds after a provider error; the batch still fails if any reply failed')
     raise SystemExit(0 if main(p.parse_args()) else 1)

@@ -77,6 +77,54 @@ def test_unconfigured_persona_route_is_explicit_unavailable(monkeypatch):
     assert response.json()["error_code"] == "AI_UNAVAILABLE"
 
 
+def test_voice_unknown_review_and_preparation_use_final_spoken_wording(monkeypatch):
+    data = payload()
+    data['voice_response'] = True
+    chat = ScriptedChat({'points': [point(mode='UNKNOWN', text='', understanding_ids=[])]}, review())
+    response = post(monkeypatch, data, chat)
+    assert response.status_code == 200, response.text
+    assert response.json()['answer'] == '这个我还说不准。'
+    assert chat.requests[1][1]['review_scope'][0]['rendered_text'] == response.json()['answer']
+
+
+@pytest.mark.parametrize('valid', [True, False])
+def test_single_voice_point_has_no_cross_point_dependency_to_generate(monkeypatch, valid):
+    data=payload();data['voice_response']=True
+    verdict=review(valid);verdict['points'][0].pop('depends_on')
+    chat=ScriptedChat({'points':[point()]}, verdict)
+    response=post(monkeypatch, data, chat)
+    assert response.status_code == (200 if valid else 502), response.text
+    assert len(chat.requests)==2
+    shape=chat.requests[1][1]['response_schema']
+    assert 'depends_on' not in shape['required'] and 'depends_on' not in shape['properties']
+
+
+@pytest.mark.parametrize('damage', ['multi_point', 'self_dependency', 'missing_verdict'])
+def test_single_point_schema_never_fills_semantic_fields_or_multi_point_dependencies(monkeypatch, damage):
+    data=payload();data['voice_response']=True
+    points=[point()];verdict=review()
+    if damage=='multi_point':
+        points.append(point(mode='UNKNOWN', text='', understanding_ids=[]));verdict=review(count=2)
+        verdict['points'][0].update(verdict='unsupported',codes=['unsupported'])
+        verdict['points'][1].pop('depends_on')
+    elif damage=='self_dependency':verdict['points'][0]['depends_on']=[1]
+    else:verdict['points'][0].pop('verdict')
+    response=post(monkeypatch, data, ScriptedChat({'points':points}, verdict))
+    assert response.status_code==502, response.text
+
+
+def test_all_supported_points_missing_edges_remain_one_conservative_group(monkeypatch):
+    data=payload();data['voice_response']=True
+    unknown=point(mode='UNKNOWN', text='', understanding_ids=[])
+    verdict=review(count=2)
+    for row in verdict['points']:row.pop('depends_on')
+    chat=ScriptedChat({'points':[point(),unknown]},verdict)
+    response=post(monkeypatch,data,chat)
+    assert response.status_code==200,response.text
+    assert response.json()['omitted_points']==0 and response.json()['coverage']=='complete'
+    assert len(chat.requests)==2
+
+
 def test_confirmed_conditional_simulation_tracks_support_and_counterexample(monkeypatch):
     chat = ScriptedChat({"points": [point()]}, review())
     response = post(monkeypatch, payload(), chat, provider="weixin")

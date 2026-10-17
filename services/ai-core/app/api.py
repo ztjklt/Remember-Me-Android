@@ -20,6 +20,7 @@ from .profile_relations import RelationInput, RelationOutput
 from .narrative import NarrativeInput
 from .expression import ExpressionInput, ExpressionProvider
 from .persona import PersonaInput, PersonaOutput, PersonaProvider
+from .conversation import ConversationInput, respond as conversation_reply
 from .providers.weixin import WeixinProvider, WeixinChat, WeixinTwinProvider, WeixinCalibrationProvider
 from .limits import RequestSizeLimit
 from .providers.fixture import FixtureProvider
@@ -191,6 +192,22 @@ def create_app(
         from starlette.concurrency import run_in_threadpool
         return await run_in_threadpool(run_twin,payload)
 
+    @app.post('/conversation')
+    async def conversation(payload: ConversationInput, request: Request):
+        from .cancellation import until_disconnect
+        def run():
+            if active_persona is None or not slots.acquire(timeout=2):
+                raise ProviderUnavailable('Conversation temporarily unavailable')
+            try:
+                chat=active_persona.chat
+                with (chat.transport_scope(timeout_seconds=settings.voice_call_timeout_seconds,
+                      json_retry_after_seconds=settings.effective_voice_json_retry_after_seconds,
+                      **({'json_hedged':True} if settings.voice_json_hedged else {}))
+                      if hasattr(chat,'transport_scope') else nullcontext()):
+                    return conversation_reply(chat,payload)
+            finally: slots.release()
+        return await until_disconnect(request,run)
+
     def run_twin(payload):
         from .voice_stream import generation_streamed
         if active_twin is None:
@@ -202,7 +219,8 @@ def create_app(
         try:
             policy={'retry_after_seconds':settings.voice_retry_after_seconds} if generation_streamed.get() and settings.voice_retry_after_seconds>0 else {}
             with (active_twin.transport_scope(timeout_seconds=settings.voice_call_timeout_seconds,
-                  json_retry_after_seconds=settings.effective_voice_json_retry_after_seconds,**policy)
+                  json_retry_after_seconds=settings.effective_voice_json_retry_after_seconds,
+                  **({'json_hedged':True} if settings.voice_json_hedged else {}),**policy)
                   if payload.voice_response and hasattr(active_twin,'transport_scope') else nullcontext()):
                 return active_twin.answer(payload)
         finally:
@@ -259,7 +277,8 @@ def create_app(
         try:
             chat=getattr(active_persona,'chat',None)
             with (chat.transport_scope(timeout_seconds=settings.voice_call_timeout_seconds,
-                  json_retry_after_seconds=settings.effective_voice_json_retry_after_seconds)
+                  json_retry_after_seconds=settings.effective_voice_json_retry_after_seconds,
+                  **({'json_hedged':True} if settings.voice_json_hedged else {}))
                   if payload.voice_response and hasattr(chat,'transport_scope') else nullcontext()):
                 return active_persona.answer(payload, started_at=started)
         finally:

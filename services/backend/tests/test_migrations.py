@@ -22,6 +22,8 @@ EXPECTED_TABLES = {
     "narrative_records", "narrative_history", "narrative_preferences", "narrative_question_decisions",
     "contribution_grants", "companion_contributions", "companion_letters", "sealed_snapshots",
     "persona_answer_contexts", "companion_audio", "synthetic_voice_profiles", "voice_recipient_grants",
+    "contact_entrustments", "receipt_challenges", "receipt_sessions", "receipt_rates",
+    "letter_recall_cues",
 }
 
 

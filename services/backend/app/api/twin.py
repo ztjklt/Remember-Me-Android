@@ -99,11 +99,13 @@ def require_subject(session: Session, subject_id: str, actor: Actor) -> None:
 
 def answer_view(session: Session, row: TwinAnswer) -> dict:
     from ..persona_models import PersonaAnswerContext
+    from ..entrusted_recall import recall_actions
     meta=session.get(PersonaAnswerContext,row.answer_id)
     review=meta.review_summary if meta and row.invalidated_at is None else {}
     sources = [session.get(Evidence, identifier) for identifier in row.evidence_ids]
     return {
         "answer_id": row.answer_id, "subject_id": row.subject_id,
+        "recall_actions": recall_actions(session, row),
         "question": row.question, "answer": row.answer if row.invalidated_at is None else "相关记忆已变化，请重新提问。",
         "response_type": row.response_type, "confidence": row.confidence,
         "model_version": row.model_version, "person_model_version": row.person_model_version,
@@ -234,10 +236,8 @@ def generate_answer(subject_id, payload, request, actor, session, *, voice_conte
             episode_ids=loaded['ids'],reader=loaded['reader'],sources=loaded['sources'])
         retrieval_question=payload.question
         if voice_context:
-            # Only lookup hints. The model receives history separately as non-evidence.
-            previous=voice_context[-1]['question']
-            if len(previous)+len(retrieval_question)<980:
-                retrieval_question=previous+'；追问：'+retrieval_question
+            from ..voice_query import retrieval_query
+            retrieval_question=retrieval_query(payload.question,voice_context)
         selection_key=(subject_id,actor_id,payload.cloud_consent_id,payload.mode,snapshot.signature)
         selection=selection_cache.get(selection_key,retrieval_question) if selection_cache is not None else None
         prefetched=selection is not None
@@ -416,7 +416,10 @@ def generate_answer(subject_id, payload, request, actor, session, *, voice_conte
             or len(cited) != len(set(cited)) or any(identifier not in valid for identifier in cited)):
         raise TwinFailed("模型回答的证据格式不正确。")
     if kind == "UNKNOWN":
-        content, cited, confidence = "现有记录还不足以确定。", [], 0
+        # Match the AI Core's reviewed/prepared voice wording. Replacing this
+        # after synthesis needlessly discards valid audio and synthesizes twice.
+        content = "这个我还说不准。" if voice_context is not None else "现有记录还不足以确定。"
+        cited, confidence = [], 0
     elif (not cited and not used_notes) or not content.strip():
         raise TwinFailed("模型回答缺少可核对的证据。")
     if kind == "ORIGINAL":
@@ -473,3 +476,12 @@ def read_answer(subject_id: str, answer_id: str,
         row.invalidated_at=utcnow()
         session.commit()
     return answer_view(session, row)
+
+
+@router.get('/twin/answers/{answer_id}/letters/{letter_id}')
+def open_recall(subject_id:str,answer_id:str,letter_id:str,actor:Actor=Depends(current_actor),session:Session=Depends(get_session)):
+    answer=read_answer(subject_id,answer_id,actor,session)
+    if not any(a['letter_id']==letter_id for a in answer['recall_actions']):
+        raise TwinNotFound('这封信的访问状态已变化。')
+    from .companion import get_letter
+    return get_letter(subject_id,letter_id,actor,session)

@@ -21,6 +21,7 @@ import me.remember.app.hardware.*
 
 data class NativeState(
     val actor: String = "", val actorName: String = "", val spaces: List<JSONObject> = emptyList(),
+    val demoRole: String = "", val demoEntry: Boolean = false,
     val space: JSONObject? = null, val spaceChoiceRequired: Boolean = false, val stories: List<JSONObject> = emptyList(), val grants: List<JSONObject> = emptyList(),
     val revisions: List<JSONObject> = emptyList(), val requests: List<JSONObject> = emptyList(),
     val candidates: List<JSONObject> = emptyList(), val candidateJobs: List<JSONObject> = emptyList(),
@@ -36,6 +37,7 @@ data class NativeState(
     val portrait: JSONObject = JSONObject(),
     val companion: JSONObject = JSONObject(), val voiceProfile: JSONObject = JSONObject(), val voiceGrants: List<JSONObject> = emptyList(),
     val contributionOriginal: JSONObject? = null,
+    val openedLetter: JSONObject? = null,
     val companionAudio: CompanionAudioDraft? = null, val companionRecording: String = "",
     val calibrations: List<JSONObject> = emptyList(), val calibrationId: String = "",
     val narrative: JSONObject = JSONObject(), val narrativeJobs: List<JSONObject> = emptyList(),
@@ -67,7 +69,7 @@ internal fun sourcePlaybackLabel(player: SourcePlayback): String = when {
 }
 
 internal fun NativeState.forSpaceFallback(spaces: List<JSONObject>, selected: JSONObject?) =
-    NativeState(actor = actor, actorName = actorName, spaces = spaces, space = selected,
+    NativeState(actor = actor, actorName = actorName, demoRole = demoRole, spaces = spaces, space = selected,
         spaceChoiceRequired = selected == null && spaces.size > 1, busy = busy, notice = "可访问空间已更新。")
 
 /** Account sessions use Keystore; local originals are scoped to the authenticated identity. */
@@ -302,10 +304,60 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
     }
     private data class CaptureTransfer(val id: String, val session: BackendSession, val capture: LocalCapture, val importing: Boolean)
     private var pendingTransfer: CaptureTransfer? = null
-    init { reminders.disable(); savedSession.load()?.let { connect(it.first, it.second, remember = true) } }
+    init {
+        reminders.disable()
+        if(me.remember.app.BuildConfig.DEMO_ACCOUNTS && spacePreferences.getInt("chen-demo-generation", 0) < 2) {
+            savedSession.clear()
+            spacePreferences.edit().clear().putInt("chen-demo-generation", 2).putString("demo-role", "owner").commit()
+        }
+        val saved = savedSession.load()
+        if(saved != null) connect(saved.first, saved.second, remember = true)
+        else if(me.remember.app.BuildConfig.DEMO_ACCOUNTS) {
+            enterDemo(spacePreferences.getString("demo-role", "owner") ?: "owner")
+        }
+    }
+
+    fun enterDemo(role: String) {
+        if(!me.remember.app.BuildConfig.DEMO_ACCOUNTS || role !in setOf("owner", "relative") || state.value.busy) return
+        if(state.value.recording || state.value.companionRecording.isNotBlank() ||
+            deviceController?.ui?.value?.recordPhase in setOf(DeviceRecordPhase.RECORDING, DeviceRecordPhase.PAUSED)) {
+            report("请先结束录音，再切换账号。")
+            return
+        }
+        val previous = session
+        savedSession.clear(); clearIdentity()
+        spacePreferences.edit().putBoolean("manual-login", false).putString("demo-role", role).apply()
+        state.value = state.value.copy(demoEntry = true)
+        val operationId = beginOperation()
+        viewModelScope.launch {
+            try {
+                val result = io { accountRequest(me.remember.app.BuildConfig.SERVICE_URL, "demo-session", JSONObject().put("role", role)) }
+                check(result.text("demo_role") == role) { "演示身份未确认，请重试。" }
+                state.value = state.value.copy(busy = false)
+                connect(me.remember.app.BuildConfig.SERVICE_URL, result.getString("actor_token"), remember = true)
+            } catch(error: Exception) {
+                if(error is CancellationException) throw error
+                state.value = state.value.copy(busy = false, error = error.message ?: "暂未进入演示，请重试。",
+                    operation = OperationFeedback(operationId, ActionPhase.FAILED))
+            }
+            // Revoke only this device's old token; other demo devices stay signed in.
+            if(previous != null) withContext(Dispatchers.IO) {
+                runCatching { accountRequest(previous.server, "logout", token = previous.token) }
+            }
+        }
+    }
+
+    fun useManualLogin() {
+        if(me.remember.app.BuildConfig.DEMO_ACCOUNTS) return
+        if(state.value.busy) return
+        spacePreferences.edit().putBoolean("manual-login", true).apply()
+        state.value = state.value.copy(demoEntry = false, error = null)
+    }
 
     fun signIn(server: String, username: String, password: String, name: String? = null) {
+        if(me.remember.app.BuildConfig.DEMO_ACCOUNTS) return
         if(state.value.busy) return
+        spacePreferences.edit().putBoolean("manual-login", true).apply()
         val operationId = beginOperation()
         viewModelScope.launch {
             try {
@@ -368,14 +420,22 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
     fun connect(server: String, token: String, remember: Boolean = false) {
         if(state.value.busy || state.value.recording) return
         clearIdentity()
+        state.value = state.value.copy(demoEntry = me.remember.app.BuildConfig.DEMO_ACCOUNTS && !spacePreferences.getBoolean("manual-login", false))
         val next = runCatching { gate.connect(server, token) }.getOrElse { report(it.message ?: "服务地址无效。"); return }
         session = next
         operation(next) {
             val result = io { client.json(next, "/api/v1/workbench/spaces") }
+            if(me.remember.app.BuildConfig.DEMO_ACCOUNTS) check(result.text("demo_role") in setOf("owner", "relative") && result.text("demo_subject_id").isNotBlank()) {
+                savedSession.clear()
+                "请重新选择演示身份。"
+            }
             if(remember) savedSession.save(next.server, next.token) else savedSession.clear()
-            state.value = state.value.copy(actor = result.text("actor_id"), actorName = result.text("display_name"), spaces = result.rows())
+            state.value = state.value.copy(actor = result.text("actor_id"), actorName = result.text("display_name"),
+                demoRole = result.text("demo_role"), demoEntry = false, spaces = result.rows())
             val saved = spacePreferences.getString("${next.server}:${result.text("actor_id")}", null)
-            val allSpaces = discoverSpaces(next, result.rows())
+            val discovered = discoverSpaces(next, result.rows())
+            val demoSubject = result.text("demo_subject_id")
+            val allSpaces = if(demoSubject.isNotBlank()) discovered.filter { it.text("subject_id") == demoSubject } else discovered
             val chosen = initialSpace(allSpaces, saved)
             state.value = state.value.copy(spaces = allSpaces, space = chosen, spaceChoiceRequired = chosen == null && allSpaces.size > 1)
             refreshNow(next)
@@ -396,7 +456,7 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
         closeRecorder(); endVoice();stopSource(); audio.stopPlayback(); polling?.cancel(); captureJob?.cancel(); feedJob?.cancel()
         captureAttempts.clear(); captureRetryAt.clear(); reminders.disable(); pendingTransfer = null
         session = gate.advance()
-        state.value = NativeState(actor = state.value.actor, actorName = state.value.actorName, spaces = state.value.spaces, space = space)
+        state.value = NativeState(actor = state.value.actor, actorName = state.value.actorName, demoRole = state.value.demoRole, spaces = state.value.spaces, space = space)
         refresh()
         val next = session ?: return
         polling = viewModelScope.launch { while(isActive && gate.accepts(next)) {
@@ -408,6 +468,7 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
     fun logout() {
         val previous = session
         fun leave() {
+            spacePreferences.edit().putBoolean("manual-login", true).apply()
             savedSession.clear(); clearIdentity()
             if(previous != null) viewModelScope.launch {
                 runCatching { withContext(Dispatchers.IO) { accountRequest(previous.server, "logout", token = previous.token) } }
@@ -419,6 +480,7 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
     private fun clearIdentity() {
         closeRecorder()
         endVoice()
+        closeLetter()
         reminders.disable(); creationKeys.clear()
         gate.clear(); session = null; polling?.cancel(); ticker?.cancel(); recordTarget = null; activeCapture = null; pendingTransfer = null
         captureJob?.cancel(); feedJob?.cancel(); captureAttempts.clear(); captureRetryAt.clear(); loadedDraftScope=""
@@ -506,7 +568,11 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
     private suspend fun discoverSpaces(s: BackendSession, regular: List<JSONObject>): List<JSONObject> =
         mergeCompanionSpaces(regular, optionalJson(s,"/api/v1/companion/spaces").rows())
     private suspend fun refreshNow(s: BackendSession) {
-        val spaces = discoverSpaces(s, io { client.json(s, "/api/v1/workbench/spaces").rows() })
+        val identities = io { client.json(s, "/api/v1/workbench/spaces") }
+        val discovered = discoverSpaces(s, identities.rows())
+        val demoSubject = identities.text("demo_subject_id")
+        val spaces = if(demoSubject.isNotBlank()) discovered.filter { it.text("subject_id") == demoSubject } else discovered
+        state.value = state.value.copy(demoRole = identities.text("demo_role"))
         val selected = spaces.firstOrNull { it.text("subject_id") == state.value.subject }
             ?: if(state.value.spaceChoiceRequired) initialSpace(spaces, null) else spaces.firstOrNull()
         if(selected?.text("subject_id").orEmpty() != state.value.subject) {
@@ -921,7 +987,7 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
         val s = session ?: return; val draft = state.value.companionAudio ?: return; val subject = state.value.subject
         operation(s) {
             val result = io { client.uploadCompanionAudio(s,subject,draft.purpose,draft.file,draft.mime,draft.key) }
-            persistCompanionDraft(s,draft.copy(remote = result));state.value = state.value.copy(notice = "声音已保存，可以开始转写。")
+            persistCompanionDraft(s,draft.copy(remote = result));state.value = state.value.copy(notice = "声音已保存。")
         }
     }
     fun transcribeCompanionAudio(confirmed: Boolean) {
@@ -954,6 +1020,38 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
             creationKeys.remove(signature)
             if(state.value.companionAudio?.purpose == if(kind=="letters") "letter" else "contribution") persistCompanionDraft(s,null)
             refreshNow(s); saved()
+        }
+    }
+    /** This feature owns no Agent state. Publish only into the initiating identity and space. */
+    fun loadContactEntrustments(done: (JSONObject) -> Unit) {
+        val s=session?:return; val subject=state.value.subject
+        val path=root()+"/contact-entrustments"
+        operation(s) {
+            val result=io {
+                try {client.json(s,path).put("sources",client.json(s,"$path/sources").optJSONArray("items"))}
+                catch(error: BackendHttpException) {
+                    if(error.status==404) throw IllegalStateException("当前服务器尚未开通联系方式托付，原有账号专属信仍可使用。")
+                    throw error
+                }
+            }
+            gate.requireCurrent(s)
+            if(state.value.subject==subject) done(result)
+        }
+    }
+    fun contactEntrustmentAction(suffix: String, body: JSONObject=JSONObject(), done: (JSONObject) -> Unit) {
+        val s=session?:return;val subject=state.value.subject
+        val path=root()+"/contact-entrustments"+suffix
+        // Repeated confirmation after a lost HTTP response must not issue a second link.
+        val signature="$path\n$body"
+        val payload=JSONObject(body.toString())
+        if(suffix.isEmpty()) payload.put("idempotency_key",creationKeys.getOrPut(signature){java.util.UUID.randomUUID().toString()})
+        operation(s) {
+            val result=io {client.json(s,path,"POST",payload)}
+            gate.requireCurrent(s)
+            if(state.value.subject==subject) {
+                done(result)
+                if(suffix.isEmpty()) creationKeys.remove(signature)
+            }
         }
     }
     fun openContributionOriginal(id: String) {
@@ -1042,6 +1140,30 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
             client.media(s,"$path/voice/assets/${segment(assetId)}/audio")
         }
     }
+    private var letterGuard: Job? = null
+    fun openRecall(answerId: String, letterId: String) {
+        val s=session ?: return
+        val path=subjectRoot()+"/twin/answers/${segment(answerId)}/letters/${segment(letterId)}"
+        callState.value?.pause("正在读信")
+        closeLetter()
+        operation(s) {
+            val letter=io { client.json(s,path) }
+            if(session!=s) return@operation
+            state.value=state.value.copy(openedLetter=letter)
+            letterGuard=viewModelScope.launch {
+                while(isActive && session==s && state.value.openedLetter!=null) {
+                    delay(15000)
+                    if(session!=s || state.value.openedLetter?.text("id")!=letterId) break
+                    try { io { client.json(s,path) } }
+                    catch(e: Exception) { if(e is CancellationException) throw e; closeLetter(); report("这封信暂时无法查看，请重新打开。"); break }
+                }
+            }
+        }
+    }
+    fun closeLetter() {
+        letterGuard?.cancel();letterGuard=null;stopSource()
+        state.value=state.value.copy(openedLetter=null)
+    }
     fun playCompanionAudio(id: String) {
         val path = root()+"/companion/audio/"+segment(id)
         playRemote("companion:$id") { s -> client.media(s,"$path/content") }
@@ -1051,7 +1173,11 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
         operation(s) {
             stopSource(); audio.stopPlayback()
             val ticket = playbackGate.begin(s)
-            val bytes = io { load(s) }
+            state.value=state.value.copy(player=SourcePlayback(episode=episode,preparing=true))
+            val bytes = try { io { load(s) } } catch(error:Exception) {
+                if(playbackGate.isCurrent(ticket)) stopSource()
+                throw error
+            }
             // No cache or player may be restored by a download that crossed Home, stop, or identity change.
             playbackGate.publish(ticket) {
                 val file = File(sources, "source-${s.epoch}-${ticket.generation}.audio"); file.writeBytes(bytes)
@@ -1114,7 +1240,8 @@ class NativeWorkbenchModel(context: Context, val audio: AndroidAudioCaptureServi
                                     "android-${File(recording.audioPath).nameWithoutExtension}", revision = recordTarget)) }
                         }
                         savedSession.clear(); clearIdentity()
-                        state.value = state.value.copy(error = "登录已失效，请重新登录。本机原音仍保留。")
+                        state.value = state.value.copy(demoEntry = me.remember.app.BuildConfig.DEMO_ACCOUNTS && !spacePreferences.getBoolean("manual-login", false),
+                            error = "登录已失效，请重新进入。本机原音仍保留。")
                     } else state.value = state.value.copy(error = error.message?.take(500) ?: "操作未完成，原音已保留。")
                 }
             } finally { if(gate.accepts(s)) state.value = state.value.copy(busy = false,

@@ -22,10 +22,30 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     enable_workbench: bool = False
     allow_account_registration: bool | None = None
+    # Explicitly public, fictional demo identities. Never configure real accounts.
+    demo_accounts_enabled: bool = False
+    demo_owner_actor_id: str = ''
+    demo_relative_actor_id: str = ''
+    demo_subject_id: str = ''
     allowed_hosts: list[str] = ['127.0.0.1', 'localhost', '[::1]', 'testserver']
     work3200_app_id: str = ''
     work3200_app_key: SecretStr = SecretStr('')
     work3200_environment: Literal['DEVELOPMENT', 'PRODUCTION'] = 'DEVELOPMENT'
+
+    # Account-free contact entrustment. Disabled until key, URL and delivery are configured.
+    contact_entrustment_key: SecretStr = SecretStr('')
+    contact_entrustment_public_url: str = ''
+    contact_smtp_host: str = ''
+    contact_smtp_port: int = Field(default=465, ge=1, le=65535)
+    contact_smtp_tls: Literal['ssl', 'starttls'] = 'ssl'
+    contact_smtp_username: str = ''
+    contact_smtp_password: SecretStr = SecretStr('')
+    contact_smtp_from: str = ''
+    contact_sms_access_key_id: str = ''
+    contact_sms_access_key_secret: SecretStr = SecretStr('')
+    contact_sms_sign_name: str = ''
+    contact_sms_code_template: str = ''
+    contact_sms_notice_template: str = ''
 
     # SQLite is the local development and test default. Deployment supplies a
     # PostgreSQL DSN and adds the driver (see ADR-0001 D3).

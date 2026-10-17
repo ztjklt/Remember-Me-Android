@@ -80,11 +80,24 @@ def test_reviewer_sees_conflicting_full_source_and_can_replace_then_recheck():
     other.memory_item_id='m2'; other.evidence[0].evidence_id='e2'; other.evidence[0].episode_id='ep2'
     other.evidence[0].excerpt='之前讲淡茶，但我现在喜欢红茶。'
     other.evidence[0].span_end=len(other.evidence[0].excerpt); p.candidates.append(other)
-    chat=Chat(verdict(False, {'points':[{'known':True,'source_ids':['s2']}]}), verdict())
+    class CorrectingChat(Chat):
+        def __init__(self): super().__init__()
+
+        def complete(self, system, packet):
+            self.requests.append((system, packet))
+            if len(self.requests)==1:
+                proposed=packet['selection']['points'][0]['quotes'][0]['source_id']
+                self.replacement_id='s2' if proposed=='s1' else 's1'
+                return verdict(False, {'points':[{'known':True,'source_ids':[self.replacement_id]}]}), 'actual-review-model'
+            return verdict(), 'actual-review-model'
+
+    chat=CorrectingChat()
     answer=QuotedTwin(chat).answer(p)
-    assert answer.evidence_ids==['e2'] and len(chat.requests)==2
+    expected_evidence='e2' if chat.replacement_id=='s2' else 'e1'
+    assert answer.evidence_ids==[expected_evidence] and len(chat.requests)==2
     assert len(chat.requests[0][1]['recordings'])==2
-    assert chat.requests[1][1]['cited_material'][0]['sources'][0]['id']=='s2'
+    assert chat.requests[1][1]['cited_material'][0]['sources'][0]['id']==chat.replacement_id
+    assert chat.requests[0][1]['recordings']==chat.requests[1][1]['recordings']
 
 
 def test_negative_proposal_can_fall_back_but_cannot_revote_unchanged_answer():
@@ -114,13 +127,24 @@ def test_complex_or_unresolved_questions_keep_selection_and_review(question):
     assert 'selection' not in chat.requests[0][1] and len(chat.requests)==2
 
 
-def test_written_material_and_oversized_sources_do_not_become_original_proposals():
-    for p in [payload(text='我喜欢淡茶。'*80), payload()]:
-        if len(p.candidates[0].evidence[0].excerpt)<380:
-            p.candidates[0].evidence[0].source_type='CALIBRATION'
-        chat=Chat({'points':[{'known':False,'source_ids':[]}]}, verdict())
-        QuotedTwin(chat).answer(p)
-        assert 'selection' not in chat.requests[0][1]
+def test_written_material_is_not_proposed_and_large_originals_keep_full_parent_review():
+    written=payload()
+    written.candidates[0].evidence[0].source_type='CALIBRATION'
+    chat=Chat({'points':[{'known':False,'source_ids':[]}]}, verdict())
+    QuotedTwin(chat).answer(written)
+    assert 'selection' not in chat.requests[0][1] and len(chat.requests)==2
+
+    large=payload(text='我喜欢淡茶。'*80)
+    chat=Chat(verdict())
+    answer=QuotedTwin(chat).answer(large)
+    assert len(chat.requests)==1 and answer.evidence_ids==['e1']
+    request=chat.requests[0][1]
+    selected=request['cited_material'][0]['sources'][0]
+    parent=next(s for s in request['recordings'][0]['sources'] if s['id']==selected['parent_id'])
+    assert parent['text']==large.candidates[0].evidence[0].excerpt
+    assert len(parent['text'])>380 and len(answer.answer)<=380
+    assert selected['text']==parent['text'][selected['start']:selected['end']]
+    assert answer.response_type=='SIMULATION' and answer.answer=='“'+selected['text']+'”'
 
 
 def test_private_preparation_never_releases_rejected_proposal():
